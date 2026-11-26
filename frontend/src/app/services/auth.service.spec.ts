@@ -31,7 +31,7 @@ describe('AuthService', () => {
     const token = 'header.eyJpZCI6MSwiZW1haWwiOiJhQGIuY29tIn0.signature';
     auth.login({ email: 'a@b.com', password: 'secret' }).subscribe();
 
-    const loginRequest = httpMock.expectOne('http://localhost:4000/api/login');
+    const loginRequest = httpMock.expectOne((request) => request.url.endsWith('/api/login'));
     expect(loginRequest.request.method).toBe('POST');
     expect(loginRequest.request.body).toEqual({ email: 'a@b.com', password: 'secret' });
     loginRequest.flush({ message: 'ok', token });
@@ -39,8 +39,8 @@ describe('AuthService', () => {
     expect(localStorage.getItem('asistencia_access_token')).toBe(token);
     expect(auth.usuario()?.id).toBe(1);
 
-    http.get('http://localhost:4000/api/users').subscribe();
-    const protectedRequest = httpMock.expectOne('http://localhost:4000/api/users');
+    http.get('/api/users').subscribe();
+    const protectedRequest = httpMock.expectOne((request) => request.url.endsWith('/api/users'));
     expect(protectedRequest.request.headers.get('Authorization')).toBe(`Bearer ${token}`);
     protectedRequest.flush([]);
   });

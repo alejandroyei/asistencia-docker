@@ -8,6 +8,7 @@ export type returnEnvironmentVars = {
     DB_USER: string;
     DB_PASSWORD: string;
     DB_NAME: string;
+    JWT_SECRET: string;
 }
 
 type validationEnvironmentVars = {
@@ -23,6 +24,7 @@ function validateEnvVars(vars:NodeJS.ProcessEnv):validationEnvironmentVars{
         DB_USER: joi.string().required(),
         DB_PASSWORD: joi.string().allow("").required(),
         DB_NAME: joi.string().required(),
+        JWT_SECRET: joi.string().min(32).required(),
     }).unknown(true);
     const {error, value} = envSchema.validate(vars);
     return {error, value};
@@ -41,7 +43,8 @@ const loadEnvVars = () : returnEnvironmentVars => {
         DB_PORT: value.DB_PORT, 
         DB_USER: value.DB_USER,
         DB_PASSWORD: value.DB_PASSWORD,
-        DB_NAME: value.DB_NAME
+        DB_NAME: value.DB_NAME,
+        JWT_SECRET: value.JWT_SECRET
     }
 }
 

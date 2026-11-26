@@ -1,14 +1,13 @@
 import type { object } from "joi";
-import jwt from "jsonwebtoken";  
-
-const JWT_SECRET = "ashjf83uoiaedu834ujah833hhysh24";
+import jwt from "jsonwebtoken";
+import envs from "../../../shared/config/environment-vars";
 
 export class AuthApplication{
     static generateToken(payload:object): string{
-        return jwt.sign(payload, JWT_SECRET, {expiresIn: "1h"});
+        return jwt.sign(payload, envs.JWT_SECRET, {expiresIn: "1h"});
     }
 
     static verifyToken(token:string):any{
-        return jwt.verify(token, JWT_SECRET);
+        return jwt.verify(token, envs.JWT_SECRET);
     }
 }
