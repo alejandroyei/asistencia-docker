@@ -43,11 +43,11 @@ jobs:
           cache-from: type=gha,scope=backend
           cache-to: type=gha,mode=max,scope=backend
 
-      - name: Construir imagen Docker
-        run: docker build -t alejandroyei/node-asistencia:latest .
+      # - name: Construir imagen Docker
+      #   run: docker build -t alejandroyei/node-asistencia:latest .
       
-      - name: Publicar imagen en Docker Hub
-        run: docker push alejandroyei/node-asistencia:latest
+      # - name: Publicar imagen en Docker Hub
+      #   run: docker push alejandroyei/node-asistencia:latest
 
   deploy-backend:
     needs: build-backend
