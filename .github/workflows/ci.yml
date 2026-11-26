@@ -35,10 +35,11 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: ./backend
+          file: ./backend/Dockerfile
           push: true
           tags: |
-            alejandroyei/node-asistencia:latest .
-            alejandroyei/node-asistencia:latest
+            alejandroyei/node-asistencia:latest 
+            alejandroyei/node-asistencia:${{ github.sha }}
           cache-from: type=gha,scope=backend
           cache-to: type=gha,mode=max,scope=backend
 
