@@ -1,0 +1,107 @@
+import type { Repository } from "typeorm";
+import { Promotion, Promotion as PromotionEntity } from "../entities/Promotion";
+import type { Promotion as PromotionDomain } from "../../domain/Promotion";
+import type { PromotionPort } from "../../domain/PromotionPort";
+import { AppDataSource } from "../../../../shared/config/data-base";
+import { Programs } from "../../../programs/infraestructure/entities/Programs";
+
+export class PromotionAdapter implements PromotionPort {
+    private promotionRepository: Repository<PromotionEntity>;
+
+    constructor(){
+        this.promotionRepository = AppDataSource.getRepository(PromotionEntity);
+    }
+
+    private toDomain(promotion: PromotionEntity): PromotionDomain {
+        return {
+            id_promotion: promotion.id_promotion,
+            name_promotion: promotion.name_promotion,
+            id_programs: promotion.Programs.id,
+            status_promotions: promotion.status_promotions,
+            Programs: promotion.Programs
+        };
+    }
+
+    private toEntity(promotion: Omit<PromotionDomain, "id_promotion" | "Programs">): PromotionEntity {
+        const promotionEntity = new PromotionEntity();
+        promotionEntity.name_promotion = promotion.name_promotion;
+        promotionEntity.Programs = {id: promotion.id_programs} as Programs;
+        promotionEntity.status_promotions = promotion.status_promotions;
+        return promotionEntity;
+    }
+
+    async createPromotion(promotion: Omit<PromotionDomain, "id_promotion" | "Programs">): Promise<number> {
+        try {
+            const newPromotion = this.toEntity(promotion);
+            const savedPromotion = await this.promotionRepository.save(newPromotion);
+            return savedPromotion.id_promotion;
+        } catch (error) {
+            console.error("Error creando promocion", error);
+            throw new Error("Error al crear promocion");
+        }
+    }
+
+    async updatePromotion(id: number, promotion: Partial<Omit<PromotionDomain, "Programs">>): Promise<boolean> {
+        try {
+            const existPromotion = await this.promotionRepository.findOne({ where: { id_promotion: id } });
+            if (!existPromotion) return false;
+
+            Object.assign(existPromotion, {
+                name_promotion: promotion.name_promotion ?? existPromotion.name_promotion,
+                Programs: promotion.id_programs ? {id: promotion.id_programs} as Programs : existPromotion.Programs,
+                status_promotions: promotion.status_promotions ?? existPromotion.status_promotions,
+            });
+
+            await this.promotionRepository.save(existPromotion);
+            return true;
+        } catch (error) {
+            console.error("Error actualizando promocion", error);
+            throw new Error("Error al actualizar promocion");
+        }
+    }
+
+    async deletePromotion(id: number): Promise<boolean> {
+        try {
+            const existPromotion = await this.promotionRepository.findOne({where: {id_promotion: id}});
+            if (!existPromotion) return false;
+            Object.assign(existPromotion, {
+                status_promotions: 0
+            })
+            await this.promotionRepository.save(existPromotion);
+            return true;
+        } catch (error) {
+            console.error("Error al dar de baja el registro de promocion");
+            throw new Error("Error al dar de baja la promocion");
+        }
+    }
+
+    async getPromotionById(id: number): Promise<PromotionDomain | null> {
+        try {
+            const promotion = await this.promotionRepository.findOne({ where: { id_promotion: id }, relations: {Programs:true}});
+            return promotion ? this.toDomain(promotion) : null;
+        } catch (error) {
+            console.error("Error obteniendo promocion por ID", error);
+            throw new Error("Error al obtener promocion por ID");
+        }
+    }
+
+    async getAllPromotions(): Promise<PromotionDomain[]> {
+        try {
+            const promotions = await this.promotionRepository.find({relations: {Programs: true}});
+            return promotions.map(this.toDomain);
+        } catch (error) {
+            console.error("Error obteniendo todas las promociones", error);
+            throw new Error("Error al obtener todas las promociones");
+        }
+    }
+
+    async getPromotionsByProgram(programId: number): Promise<PromotionDomain[] | null> {
+        try {
+            const promotions = await this.promotionRepository.find({ where: { Programs: {id:programId}}, relations: {Programs:true}});
+            return promotions ? promotions.map((p) => this.toDomain(p)) : null;
+        } catch (error) {
+            console.error("Error obteniendo promociones por programa", error);
+            throw new Error("Error al obtener promociones por programa");
+        }
+    }
+}

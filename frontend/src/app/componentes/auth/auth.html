@@ -1,0 +1,46 @@
+<main class="auth-page">
+  <section class="auth-panel" aria-labelledby="login-title">
+    <aside class="auth-brand" aria-label="CO360">
+      
+    
+          <img src="uniempresarial-logo.png" alt="Uniempresarial">
+
+      <section class="brand-message">
+        <i aria-hidden="true"></i>
+        <h1>Gestión de asistencia</h1>
+        <p>Accede a la plataforma para gestionar las sesiones y su asistencia.</p>
+      </section>
+
+      <small>Uniempresarial</small>
+    </aside>
+
+    <section class="auth-form">
+      <p class="eyebrow">Acceso seguro</p>
+      <h2 id="login-title">Bienvenido de nuevo</h2>
+      <p class="intro">Ingresa con tus credenciales para continuar.</p>
+
+      <form (ngSubmit)="iniciarSesion()">
+        <label for="email" class="form-label">Correo institucional</label>
+        <input id="email" name="email" class="form-control" type="email" placeholder="nombre@empresa.com" autocomplete="email" [(ngModel)]="email" required>
+
+        <label for="password" class="form-label mt-1">Contraseña</label>
+        <section class="password-field">
+          <input id="password" name="password" class="form-control" type="password" autocomplete="current-password" [(ngModel)]="password" required>
+          <button class="password-toggle" type="button"></button>
+        </section>
+
+        <section class="auth-options">
+          <label class="form-check"><input class="form-check-input" type="checkbox"> <span>Recordarme</span></label>
+          <a href="#recuperar">¿Olvidaste tu contraseña?</a>
+        </section>
+
+        @if (errorMessage()) {
+          <p class="text-danger" role="alert" aria-live="polite">{{ errorMessage() }}</p>
+        }
+        <button class="btn btn-primary login-button" type="submit" [disabled]="loading()">{{ loading() ? 'Ingresando…' : 'Iniciar sesión' }}</button>
+      </form>
+      <p class="register-link">¿Aún no tienes cuenta? <button type="button" routerLink="/registrarse">Regístrate</button></p>
+      <p class="auth-footer">Plataforma de asistencia</p>
+    </section>
+  </section>
+</main>

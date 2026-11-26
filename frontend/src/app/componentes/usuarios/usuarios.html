@@ -1,0 +1,159 @@
+<main class="usuarios-page">
+  <app-menu />
+
+  <section class="usuarios-content" aria-labelledby="usuarios-title">
+    <header class="content-header">
+      <section>
+        <p class="eyebrow">Gestión académica</p>
+        <h1 id="usuarios-title">Usuarios</h1>
+      </section>
+    </header>
+
+    @if (creating()) {
+      <form class="edit-form" (submit)="createUsuario(firstName.value, lastName.value, email.value, password.value, phone.value, roleId.value, programId.value); $event.preventDefault()">
+        <section class="form-title">
+          <h2>Agregar usuario</h2>
+          <p>Registra la información del nuevo usuario.</p>
+        </section>
+        <label class="form-label" for="new-firstName">Nombre</label>
+        <input #firstName id="new-firstName" class="form-control" placeholder="Nombre" required>
+        <label class="form-label" for="new-lastName">Apellido</label>
+        <input #lastName id="new-lastName" class="form-control" placeholder="Apellido" required>
+        <label class="form-label" for="new-email">Correo institucional</label>
+        <input #email id="new-email" class="form-control" type="email" placeholder="nombre@uni.edu.co" required>
+        <label class="form-label" for="new-phone">Teléfono</label>
+        <input #phone id="new-phone" class="form-control" type="tel" placeholder="Teléfono" required>
+        <label class="form-label" for="new-password">Contraseña</label>
+        <input #password id="new-password" class="form-control" type="password" placeholder="Contraseña" required>
+        <label class="form-label" for="new-roleId">Rol</label>
+        <select #roleId id="new-roleId" class="form-control" required>
+          <option value="" disabled selected>Selecciona un rol</option>
+          @for (rol of roles(); track rol.id_role) {
+            <option [value]="rol.id_role">{{ rol.name_role }}</option>
+          }
+        </select>
+        <label class="form-label" for="new-programId">Programa académico</label>
+        <select #programId id="new-programId" class="form-control" required>
+          <option value="" disabled selected>Selecciona un programa</option>
+          @for (programa of programas(); track programa.id) {
+            <option [value]="programa.id">{{ programa.name }}</option>
+          }
+        </select>
+        <section class="form-actions">
+          <button class="btn btn-outline-secondary" type="button" (click)="cancelCreate()">Cancelar</button>
+          <button class="btn btn-primary add-button" type="submit">Agregar usuario</button>
+        </section>
+      </form>
+    } @else if (editingId(); as editId) {
+      @for (usuario of usuarios(); track usuario.user_id) {
+        @if (usuario.user_id === editId) {
+          <form class="edit-form" (submit)="saveUsuario(usuario.user_id, firstName.value, lastName.value, email.value, roleId.value, programId.value); $event.preventDefault()">
+            <section class="form-title">
+              <h2>Editar usuario</h2>
+              <p>Actualiza la información del usuario seleccionado.</p>
+            </section>
+            <label class="form-label" for="edit-firstName">Nombre</label>
+            <input #firstName id="edit-firstName" class="form-control" [value]="usuario.user_first_name" required>
+            <label class="form-label" for="edit-lastName">Apellido</label>
+            <input #lastName id="edit-lastName" class="form-control" [value]="usuario.user_last_name" required>
+            <label class="form-label" for="edit-email">Correo institucional</label>
+            <input #email id="edit-email" class="form-control" type="email" [value]="usuario.user_email" required>
+            <label class="form-label" for="edit-roleId">Rol</label>
+            <select #roleId id="edit-roleId" class="form-control" [value]="usuario.user_role_id" required>
+              <option value="" disabled selected>Selecciona un rol</option>
+              @for (rol of roles(); track rol.id_role) {
+                <option [value]="rol.id_role">{{ rol.name_role }}</option>
+              }
+            </select>
+            <label class="form-label" for="edit-programId">Programa académico</label>
+            <select #programId id="edit-programId" class="form-control" [value]="usuario.user_program_id" required>
+              <option value="" disabled selected>Selecciona un programa</option>
+              @for (programa of programas(); track programa.id) {
+                <option [value]="programa.id">{{ programa.name }}</option>
+              }
+            </select>
+            <section class="form-actions">
+              <button class="btn btn-outline-secondary" type="button" (click)="cancelEdit()">Cancelar</button>
+              <button class="btn btn-primary add-button" type="submit">Guardar cambios</button>
+            </section>
+          </form>
+        }
+      }
+    } @else {
+      <section class="usuarios-toolbar">
+        <label class="search-field" for="usuario-search">
+          <span class="visually-hidden">Buscar usuario</span>
+          <input id="usuario-search" class="form-control" type="search" placeholder="Buscar por nombre o correo" (input)="onSearch($any($event.target).value)">
+        </label>
+        <button class="btn btn-primary add-button" type="button" (click)="addUsuario()">Agregar usuario</button>
+      </section>
+
+      @if (selectedId() !== null) {
+        <section class="selected-actions">
+          <span>Usuario seleccionado</span>
+          <section>
+            <button class="btn btn-outline-primary btn-sm" type="button" (click)="editSelected()">Editar</button>
+            <button class="btn btn-outline-danger btn-sm" type="button" (click)="deleteSelected()">Eliminar</button>
+          </section>
+        </section>
+      }
+
+      @if (confirmingDelete()) {
+        <section class="delete-confirm" role="alert">
+          <span>¿Seguro que deseas eliminar este usuario?</span>
+          <section>
+            <button class="btn btn-sm btn-outline-secondary" type="button" (click)="cancelDelete()">Cancelar</button>
+            <button class="btn btn-sm btn-danger" type="button" (click)="confirmDelete()">Sí, eliminar</button>
+          </section>
+        </section>
+      }
+
+      @if (actionMessage()) {
+        <p class="action-message" role="status">{{ actionMessage() }}</p>
+      }
+
+      <section class="usuarios-list" aria-label="Lista de usuarios">
+        <table class="usuarios-table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>Correo</th>
+              <th>Rol</th>
+              <th>Programa</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (usuario of filteredUsuarios(); track usuario.user_id) {
+              <tr
+                class="usuario-row"
+                [class.selected]="selectedId() === usuario.user_id"
+                (click)="selectUsuario(usuario.user_id)"
+              >
+                <td>{{ usuario.user_first_name }}</td>
+                <td>{{ usuario.user_last_name }}</td>
+                <td>{{ usuario.user_email }}</td>
+                <td>
+                  <span class="role-badge" [class.admin]="usuario.user_role_id === 1" [class.docente]="usuario.user_role_id === 2">
+                    {{ getRolNombre(usuario.user_role_id) }}
+                  </span>
+                </td>
+                <td>{{ getProgramaNombre(usuario.user_program_id) }}</td>
+                <td>
+                  <span class="status" [class.inactive]="usuario.user_status_id !== 1">
+                    {{ getEstadoNombre(usuario.user_status_id) }}
+                  </span>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="empty-state">No se encontraron usuarios con esos criterios.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+    }
+  </section>
+</main>

@@ -1,0 +1,14 @@
+<main class="alumno-page">
+  <app-menu></app-menu>
+  <section class="alumno-content" aria-labelledby="alumno-title">
+    <header class="content-header"><section><p class="eyebrow">Mi perfil</p><h1 id="alumno-title">Datos del estudiante</h1></section></header>
+    @if (loading()) { <p>Cargando perfil…</p> }
+    @if (error()) { <p class="text-danger" role="alert">{{ error() }}</p> }
+    @if (alumno(); as a) {
+      <section class="alumno-card"><section class="alumno-avatar"><span>{{ a.user_first_name[0] }}{{ a.user_last_name[0] }}</span></section><section class="alumno-info"><h2>{{ a.user_first_name }} {{ a.user_last_name }}</h2><p class="alumno-email">{{ a.user_email }}</p>
+        <dl class="alumno-details"><div class="detail-row"><dt>Programa</dt><dd>{{ program() }}</dd></div><div class="detail-row"><dt>Promoción</dt><dd>{{ grupos().length ? grupos()[0].promotion?.name_promotion : 'Sin promoción asignada' }}</dd></div><div class="detail-row"><dt>Grupos inscritos</dt><dd>{{ grupos().length }}</dd></div><div class="detail-row"><dt>Estado</dt><dd>{{ a.user_status_id === 1 ? 'Activo' : 'Inactivo' }}</dd></div></dl>
+      </section></section>
+      <section class="alumno-card enrolled-groups"><h2>Mis grupos</h2>@for (g of grupos(); track g.id_group) { <article><strong>{{ g.access_code_group }}</strong><span>{{ g.subjects?.name_subjects }}</span><span>{{ g.programs?.name }}</span><span>Promoción {{ g.promotion?.name_promotion }}</span></article> } @empty { <p>Aún no tienes grupos activos.</p> }</section>
+    }
+  </section>
+</main>

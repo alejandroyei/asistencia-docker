@@ -1,0 +1,91 @@
+<main class="unirse-page">
+  <app-menu></app-menu>
+
+  <section class="unirse-content" aria-labelledby="unirse-title">
+    <header class="content-header">
+      <section>
+        <p class="eyebrow">Gestión académica</p>
+        <h1 id="unirse-title">Unirse a un grupo</h1>
+      </section>
+    </header>
+
+    <section class="unirse-form-section">
+      <h2>Ingresa el código de acceso</h2>
+      <p>Solicita el código a tu docente para unirte al grupo.</p>
+      <form class="edit-form" (submit)="unirseGrupo(); $event.preventDefault()">
+        <label class="form-label" for="codigo-acceso">Código de acceso</label>
+        <input id="codigo-acceso" class="form-control" type="text" placeholder="Ej. GRP-2024-A" [ngModel]="codigoAcceso()" (ngModelChange)="codigoAcceso.set($event)" name="codigoAcceso" required>
+        <section class="form-actions">
+          <button class="btn btn-outline-primary add-button" type="button" (click)="openQrModal()">
+            Escanear QR
+          </button>
+          <button class="btn btn-primary add-button" type="submit" [disabled]="loading()">
+            @if (loading()) {
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Uniendo...
+            } @else {
+              Unirse al grupo
+            }
+          </button>
+        </section>
+      </form>
+      @if (errorMsg()) {
+        <p class="error-message" role="alert">{{ errorMsg() }}</p>
+      }
+      @if (actionMessage()) {
+        <p class="action-message" role="status">{{ actionMessage() }}</p>
+      }
+    </section>
+
+    @if (showQrModal()) {
+      <div class="qr-modal-overlay" (click)="closeQrModal()">
+        <div class="qr-modal" role="dialog" aria-modal="true" aria-labelledby="qr-modal-title" (click)="$event.stopPropagation()">
+          <header class="qr-modal-header">
+            <h3 id="qr-modal-title">Escanear código QR</h3>
+            <button class="qr-modal-close" type="button" (click)="closeQrModal()" aria-label="Cerrar">×</button>
+          </header>
+          <div class="qr-modal-body">
+            <div class="qr-scan-area">
+              <video #qrVideo class="qr-video" aria-label="Vista de cámara para leer el código QR" autoplay muted playsinline></video>
+            </div>
+            <p class="qr-scan-hint">{{ scanning() ? 'Apunta la cámara al código QR del grupo.' : 'Solicitando acceso a la cámara…' }}</p>
+          </div>
+          <footer class="qr-modal-footer">
+            <button class="btn btn-outline-secondary" type="button" (click)="closeQrModal()">Cancelar</button>
+          </footer>
+        </div>
+      </div>
+    }
+
+    <section class="mis-grupos-section">
+      <h2>Mis grupos</h2>
+      <p>Estos son los grupos a los que ya perteneces.</p>
+      <section class="grupos-list" aria-label="Lista de mis grupos">
+        <table class="grupos-table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Programa</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (grupo of misGrupos(); track grupo.id_group) {
+              <tr>
+                <td>
+                  <span class="group-badge">{{ grupo.access_code_group }}</span>
+                </td>
+                <td>{{ grupo.subjects?.name_subjects ?? 'Grupo' }}</td>
+                <td>{{ programName(grupo) }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="3" class="empty-state">No perteneces a ningún grupo aún.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+    </section>
+  </section>
+</main>

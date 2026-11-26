@@ -1,0 +1,36 @@
+<main class="companies-page">
+<app-menu></app-menu>
+  <section class="companies-content" aria-labelledby="companies-title">
+    <header class="companies-header">
+      <section>
+        <p class="companies-eyebrow">Gestión de sesiones > Crear sesion</p>
+        <h1 id="companies-title">Crear Sesion</h1>
+      </section>
+    </header>
+    <form class="company-form" (submit)="crearSesion(date.value, group.value); $event.preventDefault()">
+      <section>
+        <h2>Agregar sesión</h2>
+        <p>Registra la información de la nueva sesión.</p>
+      </section>
+      <label class="form-label" for="session-date">Fecha de la sesión</label>
+      <input #date id="session-date" class="form-control" type="date" required>
+      <label class="form-label" for="session-group">Grupo</label>
+      <select #group id="session-group" class="form-control" required>
+        <option value="" disabled selected>Selecciona un grupo</option>
+        @for (item of grupos(); track item.id_group) {
+          <option [value]="item.id_group">{{ item.access_code_group }} · {{ item.subjects?.name_subjects }} · {{ item.programs?.name }}</option>
+        }
+      </select>
+      @if (errorMessage()) { <p class="text-danger" role="alert">{{ errorMessage() }}</p> }
+      @if (actionMessage()) { <p class="text-success" role="status">{{ actionMessage() }}</p> }
+      <section class="company-form-actions">
+        <button class="btn btn-outline-secondary" type="button" routerLink="/sesiones">
+          Cancelar
+        </button>
+        <button class="btn btn-primary company-add" type="submit" [disabled]="saving()">
+          {{ saving() ? 'Creando…' : 'Crear sesión' }}
+        </button>
+      </section>
+    </form>
+  </section>
+</main>

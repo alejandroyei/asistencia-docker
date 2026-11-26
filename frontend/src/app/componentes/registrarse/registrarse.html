@@ -1,0 +1,61 @@
+<main class="register-page">
+  <section class="register-panel" aria-labelledby="register-title">
+    <aside class="register-brand" aria-label="CO360">
+      
+      <section class="logo">
+          <img src="uniempresarial-logo.png" alt="Uniempresarial">
+          <a class="brand" href="#" aria-label="CO360, inicio">UNI<span>TRACK</span></a>
+      </section>
+
+      <section class="brand-message">
+        <i aria-hidden="true"></i>
+        <h1>Tu gestión empieza aquí.</h1>
+        <p>Crea tu cuenta y accede a las herramientas de UNITRACK.</p>
+      </section>
+
+      <small>Plataforma de asistencia</small>
+    </aside>
+
+    <section class="register-form">
+      <p class="eyebrow">Nuevo usuario</p>
+      <h2 id="register-title">Crea tu cuenta</h2>
+      <p class="intro">Completa los datos para registrarte en UNITRACK.</p>
+
+      <form novalidate (submit)="registrarse(firstName.value, lastName.value, email.value, phone.value, password.value, confirmation.value, program.value); $event.preventDefault()">
+        <label for="first-name" class="form-label">Nombre</label>
+        <input #firstName id="first-name" class="form-control" type="text" placeholder="Nombre" autocomplete="given-name" minlength="2" required>
+
+        <label for="last-name" class="form-label mt-1">Apellido</label>
+        <input #lastName id="last-name" class="form-control" type="text" placeholder="Apellido" autocomplete="family-name" minlength="2" required>
+
+        <label for="register-email" class="form-label mt-1">Correo institucional</label>
+        <input #email id="register-email" class="form-control" type="email" placeholder="nombre@empresa.com" autocomplete="email" required>
+
+        <label for="register-phone" class="form-label mt-1">Teléfono</label>
+        <input #phone id="register-phone" class="form-control" type="tel" autocomplete="tel" required>
+
+        <label for="register-program" class="form-label mt-1">Programa académico</label>
+        <select #program id="register-program" class="form-control" required>
+          <option value="" disabled selected>Selecciona tu programa</option>
+          @for (item of programas(); track item.id) { <option [value]="item.id">{{ item.name }}</option> }
+        </select>
+
+        <label for="new-password" class="form-label mt-1">Contraseña</label>
+        <section class="password-field">
+          <input #password id="new-password" class="form-control" type="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" minlength="8" required>
+          <button class="password-toggle" type="button"></button>
+        </section>
+
+        <label for="confirm-password" class="form-label mt-1">Confirmar contraseña</label>
+        <input #confirmation id="confirm-password" class="form-control" type="password" required>
+        @if (errorMessage()) { <p class="invalid-feedback d-block" role="alert">{{ errorMessage() }}</p> }
+        @if (successMessage()) { <p class="text-success" role="status">{{ successMessage() }}</p> }
+
+        <button class="btn btn-primary register-button" type="submit" [disabled]="loading() || programas().length === 0">{{ loading() ? 'Creando cuenta…' : 'Crear cuenta' }}</button>
+      </form>
+
+      <p class="login-link">¿Ya tienes una cuenta? <button type="button" routerLink="/auth">Inicia sesión</button></p>
+      <p class="register-footer">UNITRACK · Plataforma de asistencia</p>
+    </section>
+  </section>
+</main>

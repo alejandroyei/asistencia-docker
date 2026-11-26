@@ -1,0 +1,81 @@
+<main class="companies-page">
+
+<app-menu></app-menu>
+  <section class="companies-content" aria-labelledby="companies-title">
+    <header class="companies-header">
+      <section>
+        <p class="companies-eyebrow">Gestión de asistencia &gt; Registrar asistencia</p>
+
+        <h1 id="companies-title">Registrar asistencia</h1>
+      </section>
+    </header>
+
+    <form class="company-form" (submit)="saveAttendance(); $event.preventDefault()">
+      <section>
+        <h2>Registrar asistencia</h2>
+
+        <p>Selecciona la sesión y registra la asistencia de los estudiantes.</p>
+      </section>
+
+      <label class="form-label" for="attendance-session"> Sesión </label>
+
+      <select id="attendance-session" class="form-control" [ngModel]="selectedSession()" (ngModelChange)="setSession($event)" name="session" required>
+        <option [ngValue]="null" disabled>Selecciona una sesión</option>
+        @for (session of sesiones(); track session.id) { <option [ngValue]="session.id">Sesión {{ session.id }} · {{ session.date }}</option> }
+      </select>
+
+      @if (loading()) { <p>Cargando datos del grupo…</p> }
+      @if (grupo(); as currentGroup) { <p>Grupo {{ currentGroup.access_code_group }} · {{ currentGroup.subjects?.name_subjects }}</p> }
+      @if (errorMessage()) { <p class="text-danger" role="alert">{{ errorMessage() }}</p> }
+      @if (actionMessage()) { <p class="text-success" role="status">{{ actionMessage() }}</p> }
+
+      <section class="attendance-section">
+        <label class="form-label"> Lista de estudiantes </label>
+
+        <div class="attendance-list">
+          <table class="attendance-table">
+            <thead>
+              <tr>
+                <th>Estudiante</th>
+                <th>Correo</th>
+                <th>Carrera</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (usuario of usuariosGrupo(); track usuario.user_id) {
+                <tr>
+                  <td>
+                    <strong> {{ usuario.user_first_name }} {{ usuario.user_last_name }} </strong>
+                  </td>
+
+                  <td>
+                    {{ usuario.user_email }}
+                  </td>
+
+                  <td>
+                    {{ usuario.Programs?.name ?? '—' }}
+                  </td>
+
+                  <td>
+                    <button class="attendance-button" type="button" [class.present]="isPresent(usuario.user_id)" (click)="toggleAttendance(usuario.user_id)">{{ isPresent(usuario.user_id) ? 'Presente' : 'Marcar presente' }}</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="company-form-actions">
+        <button class="btn btn-outline-secondary" type="button" routerLink="/sesiones">
+          Cancelar
+        </button>
+
+        <button class="btn btn-primary company-add" type="submit" [disabled]="saving() || loading() || !sesiones().length">
+          {{ saving() ? 'Guardando…' : 'Guardar asistencia' }}
+        </button>
+      </section>
+    </form>
+  </section>
+</main>

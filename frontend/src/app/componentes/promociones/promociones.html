@@ -1,0 +1,100 @@
+<main class="promotions-page">
+<app-menu></app-menu>
+
+  <section class="promotions-content" aria-labelledby="promotions-title">
+    <header class="content-header">
+      <section>
+        <p class="eyebrow">Gestión académica</p>
+        <h1 id="promotions-title">Promociones</h1>
+      </section>
+    </header>
+
+    @if (creating()) {
+      <form class="edit-form" (submit)="createPromocion(name.value, programs.value); $event.preventDefault()">
+        <section class="form-title">
+          <h2>Agregar promoción</h2>
+          <p>Registra la información de la nueva promoción.</p>
+        </section>
+        <label class="form-label" for="new-name">Nombre de la promoción</label>
+        <input #name id="new-name" class="form-control" placeholder="Ej. 16A" required>
+        <label class="form-label" for="new-programs">Programa</label>
+        <select #programs id="new-programs" class="form-control" required>
+          <option value="" disabled selected>Selecciona un programa</option>
+          @for (programa of programas(); track programa.id) { <option [value]="programa.id">{{ programa.name }}</option> }
+        </select>
+        <section class="form-actions">
+          <button class="btn btn-outline-secondary" type="button" (click)="cancelCreate()">Cancelar</button>
+          <button class="btn btn-primary add-button" type="submit">Agregar promoción</button>
+        </section>
+      </form>
+    } @else if (editingId(); as editId) {
+      @for (promo of promociones(); track promo.id_promotion) {
+        @if (promo.id_promotion === editId) {
+          <form class="edit-form" (submit)="savePromocion(promo.id_promotion, name.value, programs.value); $event.preventDefault()">
+            <section class="form-title">
+              <h2>Editar promoción</h2>
+              <p>Actualiza la información de la promoción seleccionada.</p>
+            </section>
+            <label class="form-label" for="edit-name">Nombre de la promoción</label>
+            <input #name id="edit-name" class="form-control" [value]="promo.name_promotion" required>
+            <label class="form-label" for="edit-programs">Programa</label>
+            <select #programs id="edit-programs" class="form-control" [value]="promo.id_programs" required>
+              @for (programa of programas(); track programa.id) { <option [value]="programa.id">{{ programa.name }}</option> }
+            </select>
+            <section class="form-actions">
+              <button class="btn btn-outline-secondary" type="button" (click)="cancelEdit()">Cancelar</button>
+              <button class="btn btn-primary add-button" type="submit">Guardar cambios</button>
+            </section>
+          </form>
+        }
+      }
+    } @else {
+      <section class="promotions-toolbar">
+        <label class="search-field" for="promotion-search">
+          <span class="visually-hidden">Buscar promoción</span>
+          <input id="promotion-search" class="form-control" type="search" placeholder="Buscar por nombre o programa" (input)="onSearch($any($event.target).value)">
+        </label>
+        <button class="btn btn-primary add-button" type="button" (click)="addPromocion()">Agregar promoción</button>
+      </section>
+
+      @if (errorMessage()) { <p class="text-danger" role="alert">{{ errorMessage() }}</p> }
+      @if (selectedId() !== null) {
+        <section class="selected-actions">
+          <span>Promoción seleccionada</span>
+          <section>
+            <button class="btn btn-outline-primary btn-sm" type="button" (click)="editSelected()">Editar</button>
+            <button class="btn btn-outline-danger btn-sm" type="button" (click)="deleteSelected()">Eliminar</button>
+          </section>
+        </section>
+      }
+
+      @if (saving() || loading()) { <p class="empty-state">{{ saving() ? 'Guardando…' : 'Cargando promociones…' }}</p> }
+      @if (confirmingDelete()) {
+        <section class="delete-confirm" role="alert">
+          <span>¿Seguro que deseas eliminar esta promoción?</span>
+          <section>
+            <button class="btn btn-sm btn-outline-secondary" type="button" (click)="cancelDelete()">Cancelar</button>
+            <button class="btn btn-sm btn-danger" type="button" (click)="confirmDelete()">Sí, eliminar</button>
+          </section>
+        </section>
+      }
+
+      @if (actionMessage()) {
+        <p class="action-message" role="status">{{ actionMessage() }}</p>
+      }
+
+      <section class="promotions-list" aria-label="Lista de promociones">
+        <div class="promotion-cards">
+          @for (promo of filteredPromociones(); track promo.id_promotion) {
+            <button type="button" class="promotion-card" [class.selected]="selectedId() === promo.id_promotion" (click)="selectPromocion(promo.id_promotion)">
+              <span class="promotion-badge">{{ promo.name_promotion }}</span>
+              <span class="promotion-card-detail"><span>Programa</span><strong>{{ programName(promo) }}</strong></span>
+            </button>
+          } @empty {
+            <p class="empty-state">No se encontraron promociones con esos criterios.</p>
+          }
+        </div>
+      </section>
+    }
+  </section>
+</main>
